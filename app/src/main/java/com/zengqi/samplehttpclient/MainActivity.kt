@@ -9,6 +9,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        HttpRequestManager.init("YOUR_BASE_URL")
         btnGet.setOnClickListener {
             val params = HashMap<String, String>()
             params["page"] = "1"
