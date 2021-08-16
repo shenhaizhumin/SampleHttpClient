@@ -1,10 +1,10 @@
 # SampleHttpClient
 
 
-###step1:
+### step1:
 HttpRequestManager.init("YOUR_BASE_URL")
 
-###step2:
+### step2:
 Do get request:
 val params = HashMap<String, String>()
 params["page"] = "1"
@@ -26,4 +26,4 @@ HttpRequestManager.postForm<String>("/api/v1/post1", params, {
 
 
 
-###to be continued...
+### to be continued...
