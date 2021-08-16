@@ -1,0 +1,3 @@
+rootProject.name = "SampleHttpClient"
+include ':app'
+include ':http-core'
