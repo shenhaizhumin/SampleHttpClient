@@ -9,7 +9,7 @@ import com.zengqi.api.BaseResponse
 import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
-object HttpRequestManager {
+internal object HttpRequestManager2 {
 //    const val BASE_URL = ""
 
     var baseUrl = "http://192.168.4.133:8000"
@@ -33,9 +33,9 @@ object HttpRequestManager {
         .writeTimeOut(3000, TimeUnit.SECONDS)
         .build()
 
-    inline fun <reified T> buildRequest(
+    inline fun <reified T, reified E> buildRequest(
         req: Request,
-        crossinline success: (resp: T) -> Unit,
+        crossinline success: (resp: E) -> Unit,
         crossinline failed: (apiExec: ApiException) -> Unit
     ) {
         client.newCall(req).enqueue(object : Callback {
@@ -52,9 +52,17 @@ object HttpRequestManager {
                     response?.string(),
                     T::class.java
                 )
-                mHandler.post {
-                    success.invoke(resp)
-                }
+                resp as BaseResponse<*>
+                handlingHttpResponse(resp, {
+                    val result: E = if (E::class.java == String::class.java) {
+                        gson.toJson(it) as E
+                    } else {
+                        gson.fromJson(gson.toJson(it), E::class.java)
+                    }
+                    mHandler.post {
+                        success.invoke(result)
+                    }
+                })
 
             }
         })
@@ -70,7 +78,7 @@ object HttpRequestManager {
             .setQueryParams(params)
             .url("$baseUrl$path")
             .build()
-        buildRequest<T>(req, {
+        buildRequest<BaseResponse<T>, T>(req, {
             success.invoke(it)
         }, {
             failed.invoke(it)
@@ -116,7 +124,7 @@ object HttpRequestManager {
             .post(body)
             .url("$baseUrl$path")
             .build()
-        buildRequest<T>(req, {
+        buildRequest<BaseResponse<T>, T>(req, {
             success.invoke(it)
         }, {
             failed.invoke(it)

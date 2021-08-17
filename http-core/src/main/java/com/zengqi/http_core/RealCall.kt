@@ -91,11 +91,9 @@ class RealCall(
                             "Content-Type",
                             "application/x-www-form-urlencoded; charset=UTF-8"
                         )
-//                        val bodyStr = URLEncoder.encode(body.writeTo(), "utf-8")
                         conn?.outputStream?.write(body.writeToBuffer())
                     } else if (body is JsonBody) {
                         conn?.setRequestProperty("Content-Type", "application/json")
-//                        val json = URLEncoder.encode(gson.toJson(body), "utf-8")
                         conn?.outputStream?.write(
                             body.writeToBuffer()
                         )
