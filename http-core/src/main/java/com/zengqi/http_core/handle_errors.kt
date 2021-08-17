@@ -53,19 +53,19 @@ fun handlingExceptions(e: Throwable): ApiException {
         }
         is HttpException -> {
             val resp = e.resp
-            val errorContent = resp?.string()
+            val errorContent = resp.string()
             return try {
-                val jsonObj = JSONObject("$errorContent")
+                val jsonObj = JSONObject(errorContent)
                 var msg: String? = jsonObj.getString("msg")
                 if (msg == null) {
                     msg = jsonObj.getString("detail")
                 }
-                val code: Int? = jsonObj.getInt("code")
+                val code: Int = jsonObj.getInt("code")
                 ApiException(code ?: -200, msg)
             } catch (t: Exception) {
                 ApiException(
                     HttpError.NETWORK_ERROR.code,
-                    "${resp?.code()},${resp?.responseMessage()}"
+                    "${resp.code()},${resp.responseMessage()}"
                 )
             }
         }
