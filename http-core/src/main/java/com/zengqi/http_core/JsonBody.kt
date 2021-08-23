@@ -15,6 +15,13 @@ class JsonBody(private val names: MutableList<String>, private val values: Mutab
         return Gson().toJson(map).toByteArray()
     }
 
+    override fun toString(): String {
+        return "JsonBody{" +
+                "names=" + names +
+                ", values=" + values +
+                '}'
+    }
+
     class Builder {
         private val names: MutableList<String> = ArrayList()
         private val values: MutableList<Any> = ArrayList()

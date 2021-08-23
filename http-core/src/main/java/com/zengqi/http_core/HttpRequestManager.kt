@@ -4,9 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import com.google.gson.Gson
+import com.google.gson.TypeAdapter
+import com.google.gson.reflect.TypeToken
 import com.zengqi.MyApp
-import com.zengqi.api.BaseResponse
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 object HttpRequestManager {
@@ -48,10 +48,23 @@ object HttpRequestManager {
             }
 
             override fun onResponse(call: Call?, response: Response?) {
-                val resp = gson.fromJson(
-                    response?.string(),
-                    T::class.java
-                )
+                val resp = if (T::class.java == String::class.java) {
+                    response?.string() as T
+                } else {
+
+//                    val jsonReader =
+//                        gson.newJsonReader(response?.string()?.byteInputStream()?.reader())
+//                    val adapter: TypeAdapter<T> = gson.getAdapter(TypeToken.get(T::class.java))
+//                    val result: T = adapter.read(jsonReader)
+//                    result
+                    val type = TypeToken.get(T::class.java).type
+                    val result: T = gson.fromJson(
+                        response?.string(),
+                        type
+                    )
+                    result
+                }
+
                 mHandler.post {
                     success.invoke(resp)
                 }
@@ -122,6 +135,39 @@ object HttpRequestManager {
             failed.invoke(it)
         })
     }
-
-
 }
+
+//inline fun <reified T> Response.parseArrayEX() =
+//    try {
+//        Gson().fromJson<List<T>>(data, ParameterizedTypeImpl(T::class.java))
+//    } catch (e: Exception) {
+//        e.printStackTrace()
+//        mutableListOf<T>()
+//    }
+//
+////返回空列表替代null
+//inline fun <reified T> Response.parseArrayEXV2() =
+//    try {
+//        //如果没有data这个字段，会返回null
+//        Gson().fromJson<List<T>>(data, ParameterizedTypeImpl(T::class.java)) ?: mutableListOf<T>()
+//    } catch (e: Exception) {
+//        e.printStackTrace()
+//        mutableListOf<T>()
+//    }
+//
+//inline fun <reified T> Response.parseDataEx() =
+//    try {
+//        Gson().fromJson<T>(data, T::class.java)
+//    } catch (e: Exception) {
+//        CrashReport.postCatchedException(
+//            ResponseParseException(
+//                "数据解析 code:${code},msg:${msg},eMessage:${e.message},data:${data}",
+//                e
+//            )
+//        )
+//        e.printStackTrace()
+//        T::class.java.newInstance()
+//    }
+//private fun <T> Gson.fromJson(string: String?, type: TypeToken<T>?): T {
+//    return this.fromJson(string, type)
+//}

@@ -45,5 +45,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     api 'com.google.code.gson:gson:2.8.6'
+    api 'com.alibaba:fastjson:1.1.70.android'
+
 
 }

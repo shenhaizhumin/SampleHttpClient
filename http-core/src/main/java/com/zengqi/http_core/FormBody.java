@@ -32,6 +32,14 @@ public class FormBody extends RequestBody {
         return sb.toString();
     }
 
+    @Override
+    public String toString() {
+        return "FormBody{" +
+                "names=" + names +
+                ", values=" + values +
+                '}';
+    }
+
     @NotNull
     @Override
     public byte[] writeToBuffer() {
@@ -61,4 +69,6 @@ public class FormBody extends RequestBody {
             return new FormBody(names, values);
         }
     }
+
+
 }
