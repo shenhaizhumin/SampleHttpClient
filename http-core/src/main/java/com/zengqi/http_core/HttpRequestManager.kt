@@ -7,12 +7,16 @@ import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
 import com.zengqi.MyApp
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.HashMap
 
 object HttpRequestManager {
 //    const val BASE_URL = ""
 
-    var baseUrl = "http://192.168.4.133:8000"
+    var baseUrl = "http://192.168.3.178:8000"
 
     /**
      * 初始化base_url
@@ -57,7 +61,12 @@ object HttpRequestManager {
 //                    val adapter: TypeAdapter<T> = gson.getAdapter(TypeToken.get(T::class.java))
 //                    val result: T = adapter.read(jsonReader)
 //                    result
-                    val type = TypeToken.get(T::class.java).type
+//                    T::class.java
+                    val genericSuperclass: Type = T::class.javaClass.genericSuperclass
+                    val actualTypeArguments =
+                        (genericSuperclass as ParameterizedType).actualTypeArguments
+                    print(Arrays.toString(actualTypeArguments))
+                    val type = TypeToken.get(T::class.javaClass).type
                     val result: T = gson.fromJson(
                         response?.string(),
                         type

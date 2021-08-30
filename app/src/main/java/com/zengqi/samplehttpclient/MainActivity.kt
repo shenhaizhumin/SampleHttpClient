@@ -2,6 +2,10 @@ package com.zengqi.samplehttpclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.lzy.okgo.OkGo
+import com.zengqi.api.BaseResponse
+import com.zengqi.http_core.HttpCallback
+import com.zengqi.http_core.HttpManager2
 import com.zengqi.http_core.HttpRequestManager
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -10,13 +14,30 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 //        HttpRequestManager.init("YOUR_BASE_URL")
+//        OkGo.getInstance()
+//            .init(application)
+//        val execute = OkGo.get<MyResponse<ListBean<User>>>("")
+//            .execute(object :com.lzy.okgo.callback.Callback<MyResponse<ListBean<User>>>{
+//
+//            })
+
+
         btnGet.setOnClickListener {
             val params = HashMap<String, String>()
             params["page"] = "1"
             params["pageSize"] = "10"
-            HttpRequestManager.get<MyResponse<ListBean<Int>>>("/api/v1/subjects", params, {
-                tvGet.text = it.data.toString()
-            })
+//            HttpRequestManager.get<MyResponse<ListBean<Int>>>("/api/v1/subjects", params, {
+//                tvGet.text = it.data.toString()
+//            })
+            HttpManager2.getInstance()
+                .get<MyResponse<ListBean<Int>>>("/api/v1/subjects", params, object :
+                    HttpCallback<MyResponse<ListBean<Int>>>() {
+                    override fun onSuccess(data: MyResponse<ListBean<Int>>?) {
+                        tvGet.text = data.toString()
+                    }
+
+
+                })
         }
 
         btnForm.setOnClickListener {

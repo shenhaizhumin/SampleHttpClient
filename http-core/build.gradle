@@ -1,10 +1,10 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.github.dcendents.android-maven'
+//    id 'com.github.dcendents.android-maven'
 
 }
-group='com.github.shenhaizhumin'//com.github.{你的的账号名}
+//group='com.github.shenhaizhumin'//com.github.{你的的账号名}
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
