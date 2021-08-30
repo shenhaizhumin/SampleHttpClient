@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
 import com.zengqi.MyApp
+import com.zengqi.http_core.callback.json.JsonCallback
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
@@ -37,56 +38,30 @@ object HttpRequestManager {
         .writeTimeOut(3000, TimeUnit.SECONDS)
         .build()
 
-    inline fun <reified T> buildRequest(
+    private fun <T> buildRequest(
         req: Request,
-        crossinline success: (resp: T) -> Unit,
-        crossinline failed: (apiExec: ApiException) -> Unit
+        success: (resp: T) -> Unit,
+        failed: (apiExec: ApiException) -> Unit
     ) {
-        client.newCall(req).enqueue(object : Callback {
-            override fun onFailure(call: Call?, e: Exception?) {
-                val apiException = handlingExceptions(e!!)
-                mHandler.post {
-                    failed.invoke(apiException)
-                    Toast.makeText(MyApp.ctx, "${apiException.errorMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onResponse(call: Call?, response: Response?) {
-                val resp = if (T::class.java == String::class.java) {
-                    response?.string() as T
-                } else {
-
-//                    val jsonReader =
-//                        gson.newJsonReader(response?.string()?.byteInputStream()?.reader())
-//                    val adapter: TypeAdapter<T> = gson.getAdapter(TypeToken.get(T::class.java))
-//                    val result: T = adapter.read(jsonReader)
-//                    result
-//                    T::class.java
-                    val genericSuperclass: Type = T::class.javaClass.genericSuperclass
-                    val actualTypeArguments =
-                        (genericSuperclass as ParameterizedType).actualTypeArguments
-                    print(Arrays.toString(actualTypeArguments))
-                    val type = TypeToken.get(T::class.javaClass).type
-                    val result: T = gson.fromJson(
-                        response?.string(),
-                        type
-                    )
-                    result
-                }
-
-                mHandler.post {
-                    success.invoke(resp)
-                }
-
-            }
-        })
+//        client.newCall(req).enqueue(object : JsonCallback<T>() {
+//            override fun onSuccess(data: T) {
+//                mHandler.post { success.invoke(data) }
+//            }
+//
+//            override fun onFailed(apiException: ApiException) {
+//                mHandler.post {
+//                    failed.invoke(apiException)
+//                    Toast.makeText(MyApp.ctx, "${apiException.errorMsg}", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        })
     }
 
-    inline fun <reified T> get(
+    fun <T> get(
         path: String,
         params: HashMap<String, String>,
-        crossinline success: (data: T) -> Unit = {},
-        crossinline failed: (error: ApiException) -> Unit = {}
+        success: (data: T) -> Unit = {},
+        failed: (error: ApiException) -> Unit = {}
     ) {
         val req = Request.Builder()
             .setQueryParams(params)
@@ -99,30 +74,30 @@ object HttpRequestManager {
         })
     }
 
-    inline fun <reified T> postForm(
+    fun <T> postForm(
         path: String,
         params: HashMap<String, String>,
-        crossinline success: (data: T) -> Unit = {},
-        crossinline failed: (error: ApiException) -> Unit = {}
+        success: (data: T) -> Unit = {},
+        failed: (error: ApiException) -> Unit = {}
     ) {
         post<T>(path, params, true, success, failed)
     }
 
-    inline fun <reified T> postJson(
+    fun <T> postJson(
         path: String,
         params: HashMap<String, String>,
-        crossinline success: (data: T) -> Unit = {},
-        crossinline failed: (error: ApiException) -> Unit = {}
+        success: (data: T) -> Unit = {},
+        failed: (error: ApiException) -> Unit = {}
     ) {
         post<T>(path, params, false, success, failed)
     }
 
-    inline fun <reified T> post(
+    fun <T> post(
         path: String,
         params: HashMap<String, String>,
         isForm: Boolean,
-        crossinline success: (data: T) -> Unit = {},
-        crossinline failed: (error: ApiException) -> Unit = {}
+        success: (data: T) -> Unit = {},
+        failed: (error: ApiException) -> Unit = {}
     ) {
         val body = if (isForm) {
             FormBody.Builder()
@@ -146,7 +121,7 @@ object HttpRequestManager {
     }
 }
 
-//inline fun <reified T> Response.parseArrayEX() =
+// fun < T> Response.parseArrayEX() =
 //    try {
 //        Gson().fromJson<List<T>>(data, ParameterizedTypeImpl(T::class.java))
 //    } catch (e: Exception) {
@@ -155,7 +130,7 @@ object HttpRequestManager {
 //    }
 //
 ////返回空列表替代null
-//inline fun <reified T> Response.parseArrayEXV2() =
+// fun < T> Response.parseArrayEXV2() =
 //    try {
 //        //如果没有data这个字段，会返回null
 //        Gson().fromJson<List<T>>(data, ParameterizedTypeImpl(T::class.java)) ?: mutableListOf<T>()
@@ -164,7 +139,7 @@ object HttpRequestManager {
 //        mutableListOf<T>()
 //    }
 //
-//inline fun <reified T> Response.parseDataEx() =
+// fun < T> Response.parseDataEx() =
 //    try {
 //        Gson().fromJson<T>(data, T::class.java)
 //    } catch (e: Exception) {

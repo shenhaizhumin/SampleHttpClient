@@ -2,11 +2,10 @@ package com.zengqi.samplehttpclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.lzy.okgo.OkGo
-import com.zengqi.api.BaseResponse
-import com.zengqi.http_core.HttpCallback
+import com.zengqi.http_core.ApiException
 import com.zengqi.http_core.HttpManager2
 import com.zengqi.http_core.HttpRequestManager
+import com.zengqi.http_core.callback.json.JsonCallback
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -29,15 +28,26 @@ class MainActivity : AppCompatActivity() {
 //            HttpRequestManager.get<MyResponse<ListBean<Int>>>("/api/v1/subjects", params, {
 //                tvGet.text = it.data.toString()
 //            })
-            HttpManager2.getInstance()
-                .get<MyResponse<ListBean<Int>>>("/api/v1/subjects", params, object :
-                    HttpCallback<MyResponse<ListBean<Int>>>() {
-                    override fun onSuccess(data: MyResponse<ListBean<Int>>?) {
-                        tvGet.text = data.toString()
-                    }
-
+            HttpManager2.getInstance().get<MyResponse<ListBean<Int>>>(
+                "/api/v1/subjects",
+                params,
+                {
+                    tvGet.text = it.data.toString()
+                },{
 
                 })
+//            HttpManager2.getInstance().get(
+//                "/api/v1/subjects",
+//                params,
+//                object : JsonCallback<MyResponse<ListBean<Int>>>() {
+//                    override fun onSuccess(data: MyResponse<ListBean<Int>>?) {
+//                        tvGet.text = data.toString()
+//                    }
+//
+//                    override fun onFailed(apiException: ApiException?) {
+//
+//                    }
+//                })
         }
 
         btnForm.setOnClickListener {

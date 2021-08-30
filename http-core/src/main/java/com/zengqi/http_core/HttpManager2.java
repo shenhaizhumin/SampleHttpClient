@@ -3,15 +3,12 @@ package com.zengqi.http_core;
 import android.os.Handler;
 import android.os.Looper;
 
-import androidx.annotation.Nullable;
-
 import com.zengqi.GenericsUtils;
+import com.zengqi.http_core.callback.OnFailed;
+import com.zengqi.http_core.callback.OnSuccess;
+import com.zengqi.http_core.callback.json.JsonCallback;
 
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,15 +38,52 @@ public class HttpManager2 {
         }
     }
 
-    public  <T> void get(String path, HashMap<String, String> params, HttpCallback<T> callback) {
+//    public <T> void get(String path, HashMap<String, String> params, OnSuccess<T> success, OnFailed failed) {
+//        Request req = new Request.Builder()
+//                .setQueryParams(params)
+//                .url(baseUrl + path)
+//                .build();
+//        httpClient.newCall(req).enqueue(new JsonCallback<T>(success, failed));
+//    }
+
+//    public <T> void get(String path, HashMap<String, String> params, OnSuccess<T> onSuccess, OnFailed onFailed) {
+//        Request req = new Request.Builder()
+//                .setQueryParams(params)
+//                .url(baseUrl + path)
+//                .build();
+//        GenericsUtils.getSuperClassGenricType(onSuccess.getClass());
+//        httpClient.newCall(req).enqueue(new JsonCallback<T>() {
+//            @Override
+//            public void onSuccess(T data) {
+//                handler.post(() -> onSuccess.onSuccess(data));
+//            }
+//
+//            @Override
+//            public void onFailed(ApiException apiException) {
+//                handler.post(() -> onFailed.onFailed(apiException));
+//            }
+//        });
+//    }
+
+    public <T> void get(String path, HashMap<String, String> params, JsonCallback<T> jsonCallback) {
         Request req = new Request.Builder()
                 .setQueryParams(params)
-                .url(baseUrl+path)
+                .url(baseUrl + path)
                 .build();
-        httpClient.newCall(req).enqueue(callback);
+        httpClient.newCall(req).enqueue(jsonCallback);
     }
 
+    public <T> void get(String path, HashMap<String, String> params, OnSuccess<T> success, OnFailed failed) {
+        get(path, params, new JsonCallback<T>() {
+            @Override
+            public void onSuccess(T data) {
+                success.onSuccess(data);
+            }
 
-
-
+            @Override
+            public void onFailed(ApiException apiException) {
+                failed.onFailed(apiException);
+            }
+        });
+    }
 }
